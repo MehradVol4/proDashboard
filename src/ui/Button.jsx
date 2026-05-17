@@ -23,10 +23,22 @@ const sizes = {
 const variations = {
   primary: css`
     color: var(--color-brand-50);
-    background-color: var(--color-brand-600);
+    background: linear-gradient(
+      135deg,
+      var(--color-brand-600) 0%,
+      var(--color-brand-500) 100%
+    );
 
     &:hover {
-      background-color: var(--color-brand-700);
+      background: linear-gradient(
+        135deg,
+        var(--color-brand-700) 0%,
+        var(--color-brand-600) 100%
+      );
+    }
+
+    &:active {
+      transform: translateY(1px);
     }
   `,
   secondary: css`
@@ -52,14 +64,22 @@ const Button = styled.button`
   border: none;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.05s, box-shadow 0.2s, opacity 0.2s;
 
-  ${(props) => sizes[props.size]}
-  ${(props) => variations[props.variation]}
+  &:focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+  }
+
+  ${(props) => sizes[props.size ?? "medium"]}
+  ${(props) => variations[props.variation ?? "primary"]}
 `;
-
-Button.defaultProps = {
-  variation: "primary",
-  size: "medium",
-};
 
 export default Button;
