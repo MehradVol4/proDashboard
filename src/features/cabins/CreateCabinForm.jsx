@@ -53,7 +53,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
         }
       });
     } else {
-      createCabin({ ...data, image }, {
+      createCabin({ newCabinData: { ...data, image } }, {
         onSuccess: (data) => {
           reset(data);
         },
