@@ -13,17 +13,21 @@ import FormRow from "../../ui/FormRow";
 
 
 function CreateCabinForm({ cabinToEdit = {} }) {
-  const { id: editId, ...editValues } = cabinToEdit;
-  const isEditSession = Boolean(editId);
+  const { id: rawEditId, ...editValues } = cabinToEdit;
+  const editId =
+    rawEditId && typeof rawEditId === "object"
+      ? rawEditId.id ?? rawEditId.value ?? rawEditId.raw ?? null
+      : rawEditId;
+  const isEditSession = editId !== null && editId !== undefined && editId !== "";
   const queryClient = useQueryClient();
   const { register, handleSubmit, reset, getValues, formState } = useForm(
     {
-      defaultValues: isEditSession ? editValues : {},
+      defaultValues: isEditSession ? editValues : { discount: 0 },
     });
   const { errors } = formState;
 
   const { mutate: createCabin, isPending: isCreating } = useMutation({
-    mutationFn: createEditCabin,
+    mutationFn: ({ newCabinData }) => createEditCabin({ newCabinData }),
     onSuccess: () => {
       toast.success("New Cabin Created!");
       queryClient.invalidateQueries({
@@ -36,7 +40,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
 
   const { mutate: editCabin, isPending: isEditing } = useMutation({
-    mutationFn: (newCabinData, id) => createEditCabin(newCabinData, id),
+    mutationFn: ({ newCabinData, id }) => createEditCabin({ newCabinData, id }),
     onSuccess: () => {
       toast.success("Cabin Edited!");
       queryClient.invalidateQueries({
@@ -52,12 +56,17 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
   function onSubmit(data) {
 
-    const image = typeof data.image === 'string' ? data.image : data.image[0];
+    const image =
+      typeof data.image === "string"
+        ? data.image
+        : data.image?.length
+          ? data.image[0]
+          : editValues.image;
 
     if (isEditSession) {
       editCabin({ newCabinData: { ...data, image }, id: editId });
     } else {
-      createCabin({ ...data, image: image });
+      createCabin({ newCabinData: { ...data, image } });
     }
 
   };
@@ -86,7 +95,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="number"
           id="maxCapacity"
           disabled={isWorking} {...register("maxCapacity",
-            { required: 'This field is required' })} />
+            { required: 'This field is required', valueAsNumber: true })} />
       </FormRow>
 
       <FormRow label='Regular Price' error={errors?.regularPrice?.message}>
@@ -96,6 +105,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           id="regularPrice"{...register("regularPrice",
             {
               required: 'This field is required',
+              valueAsNumber: true,
               min: {
                 value: 2,
                 message: 'blah'
@@ -108,19 +118,25 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="number"
           id="discount"
           disabled={isWorking}
-          defaultValue={0} {...register("discount",
+          {...register("discount",
             {
               required: 'This field is required',
-              validate: (value) => value <= getValues().regularPrice || 'Discount should be less than regular price',
+              valueAsNumber: true,
+              validate: (value) => {
+                const regularPrice = getValues("regularPrice");
+                if (regularPrice === undefined || regularPrice === null || Number.isNaN(regularPrice))
+                  return true;
+                return value <= regularPrice || 'Discount should be less than regular price';
+              },
             })} />
       </FormRow>
 
       <FormRow label="Description for website" error={errors?.description?.message}>
         <Textarea
-          type="number"
+          type="text"
           id="description"
           disabled={isWorking}
-          defaultValue={0} {...register("description", { required: 'This field is required' })} />
+          {...register("description", { required: 'This field is required' })} />
       </FormRow>
 
       <FormRow label="Cabin photo" error={errors?.image?.message}>
