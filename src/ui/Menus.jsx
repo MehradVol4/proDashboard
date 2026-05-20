@@ -90,7 +90,7 @@ export function Toggle({ id }) {
       x: window.innerWidth - rect.width - rect.x,
       y: rect.y + rect.height + 8,
     })
-    openId === '' || open !== id ? open(id) : close();
+    openId === '' || openId !== id ? open(id) : close();
   };
 
   return (
@@ -104,9 +104,10 @@ export function List({ id, children }) {
   const ref = useOutsideClick(close);
 
   if (openId !== id) return null;
+  if (!position) return null;
 
   return createPortal(
-    <StyledList position={{ position }} ref={ref}>{children}</StyledList>,
+    <StyledList position={position} ref={ref}>{children}</StyledList>,
     document.body
   )
 }
@@ -134,4 +135,3 @@ Menus.Menu = Menu;
 Menus.Toggle = Toggle;
 Menus.List = List;
 Menus.Button = Button;
-

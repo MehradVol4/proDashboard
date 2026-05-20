@@ -61,11 +61,11 @@ const Empty = styled.p`
 `;
 
 
-const TableContext = createContext();
+const TableContext = createContext({ columns: "" });
 
 function Table({ columns, children }) {
   return (
-    <TableContext.Provider value={columns}>
+    <TableContext.Provider value={{ columns }}>
       <StyledTable>
         {children}
       </StyledTable>
@@ -111,5 +111,4 @@ Table.Row = Row;
 Table.Body = Body;
 Table.Footer = Footer;
 
-export default Header 
-
+export default Table
