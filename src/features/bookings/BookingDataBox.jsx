@@ -119,6 +119,13 @@ function BookingDataBox({ booking }) {
     cabins: { name: cabinName },
   } = booking;
 
+  const computedExtrasPrice =
+    extrasPrice ??
+    (hasBreakfast ? Number(numNights) * 15 * Number(numGuests) : 0);
+  const computedTotalPrice = Number(totalPrice ?? 0);
+  const computedCabinPrice =
+    cabinPrice ?? (computedTotalPrice - Number(computedExtrasPrice ?? 0));
+
   return (
     <StyledBookingDataBox>
       <Header>
@@ -165,11 +172,11 @@ function BookingDataBox({ booking }) {
 
         <Price isPaid={isPaid}>
           <DataItem icon={<HiOutlineCurrencyDollar />} label={`Total price`}>
-            {formatCurrency(totalPrice)}
+            {formatCurrency(computedTotalPrice)}
 
             {hasBreakfast &&
-              ` (${formatCurrency(cabinPrice)} cabin + ${formatCurrency(
-                extrasPrice
+              ` (${formatCurrency(computedCabinPrice)} cabin + ${formatCurrency(
+                computedExtrasPrice
               )} breakfast)`}
           </DataItem>
 
