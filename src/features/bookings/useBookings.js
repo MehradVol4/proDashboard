@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBookings } from "../../services/apiBookings";
 import { useSearchParams } from "react-router-dom";
 
 export function useBookings() {
+
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
 
   const filterValue = searchParams.get("status");
   const filter =
@@ -28,6 +30,12 @@ export function useBookings() {
     queryFn: () => getBookings({ filter, sortBy, page: safePage }),
     retry: false,
   });
+
+  //PRE-FETCHIN
+  queryClient.prefetchQuery({
+    queryKey: ["bookings", filter, sortBy, safePage + 1],
+    queryFn: () => getBookings({ filter, sortBy, page: safePage + 1 }),
+  })
 
   return { isPending, error, bookings: bookings ?? [], count: count ?? 0 };
 }
