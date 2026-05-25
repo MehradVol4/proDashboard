@@ -19,7 +19,7 @@ function SignupForm() {
     signup(
       { fullName, email, password },
       {
-        onSuccess: () => reset(),
+        onSettled:() => reset(),
       }
     );
   };
