@@ -19,7 +19,7 @@ function SignupForm() {
     signup(
       { fullName, email, password },
       {
-        onSettled:() => reset(),
+        onSettled: () => reset(),
       }
     );
   };
@@ -43,10 +43,10 @@ function SignupForm() {
           {...register("email", {
             required: "This field is required",
             pattern: {
-            value: /\S+@\S+\.\S+/,
-            message: "Please provide a valid email",
-          },
-        })}
+              value: /\S+@\S+\.\S+/,
+              message: "Please provide a valid email",
+            },
+          })}
         />
       </FormRow>
 
@@ -82,7 +82,12 @@ function SignupForm() {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset" disabled={isPending}>
+        <Button
+          variation="secondary"
+          type="reset"
+          disabled={isPending}
+          onClick={reset}
+        >
           Cancel
         </Button>
         <Button disabled={isPending}>
