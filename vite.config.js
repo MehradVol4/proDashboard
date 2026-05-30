@@ -15,49 +15,49 @@ export default defineConfig(({ mode }) => ({
       // Recharts' default imports through local ESM shims.
       {
         find: "es-toolkit/compat/get",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/get.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/get.ts"),
       },
       {
         find: "es-toolkit/compat/uniqBy",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/uniqBy.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/uniqBy.ts"),
       },
       {
         find: "es-toolkit/compat/range",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/range.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/range.ts"),
       },
       {
         find: "es-toolkit/compat/omit",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/omit.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/omit.ts"),
       },
       {
         find: "es-toolkit/compat/maxBy",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/maxBy.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/maxBy.ts"),
       },
       {
         find: "es-toolkit/compat/minBy",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/minBy.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/minBy.ts"),
       },
       {
         find: "es-toolkit/compat/sumBy",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/sumBy.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/sumBy.ts"),
       },
       {
         find: "es-toolkit/compat/sortBy",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/sortBy.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/sortBy.ts"),
       },
       {
         find: "es-toolkit/compat/throttle",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/throttle.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/throttle.ts"),
       },
       {
         find: "es-toolkit/compat/last",
-        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/last.js"),
+        replacement: path.resolve(rootDir, "src/vite-shims/es-toolkit/compat/last.ts"),
       },
       {
         find: "es-toolkit/compat/isPlainObject",
         replacement: path.resolve(
           rootDir,
-          "src/vite-shims/es-toolkit/compat/isPlainObject.js",
+          "src/vite-shims/es-toolkit/compat/isPlainObject.ts",
         ),
       },
     ],

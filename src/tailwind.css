@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@layer utilities {
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 240ms ease-out both;
+  }
+
+  .bg-shimmer {
+    background-size: 200% 200%;
+    animation: shimmer 2.4s ease-in-out infinite;
+  }
+}
+
+@layer components {
+  .page-titlebar {
+    @apply flex w-full items-baseline justify-between gap-4 flex-wrap;
+  }
+
+  .page-subtitle {
+    @apply text-[1.4rem] text-[color:var(--color-grey-500)] whitespace-nowrap;
+  }
+
+  .panel {
+    @apply rounded-[var(--border-radius-md)] border border-[var(--border-1)]
+      bg-[var(--surface-1)] shadow-[var(--shadow-sm)] backdrop-blur-[10px];
+  }
+
+  .panel-pad {
+    @apply p-6;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-[1.2rem] font-semibold
+      text-[color:var(--color-grey-700)] bg-[color:var(--surface-2)] border border-[var(--border-1)];
+  }
+
+  .accent-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-600),
+      color-mix(in oklab, var(--color-brand-500) 70%, #22c55e)
+    );
+  }
+}
