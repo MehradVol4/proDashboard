@@ -52,7 +52,9 @@ export async function getBooking(id) {
 export async function getBookingsAfterDate(date) {
   const { data, error } = await supabase
     .from("bookings")
-    .select("created_at, totalPrice, extrasPrice, hasBreakfast, numNights, numGuests")
+    // Keep this select aligned with your DB schema. Some setups don't have
+    // `extrasPrice` stored, so we compute it client-side when needed.
+    .select("created_at, totalPrice, hasBreakfast, numNights, numGuests")
     .gte("created_at", date)
     .lte("created_at", getToday({ end: true }));
 
