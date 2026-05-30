@@ -12,7 +12,7 @@ function useRecentStays() {
 
     const { isPending, data: stays } = useQuery({
         queryFn: () => getStaysAfterDate(queryDate),
-        queryKey: ['booking', `last-${numDays}`],
+        queryKey: ['stays', `last-${numDays}`],
     });
 
     const confirmedStays = stays?.filter((stay) => stay.status === 'checked-in' || stay.status === 'checked-out');
