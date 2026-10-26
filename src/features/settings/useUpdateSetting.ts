@@ -7,16 +7,17 @@ import { updateSetting as updateSettingApi } from "../../services/apiSettings";
 export function useUpdateSetting() {
 
     const queryClient = useQueryClient();
-    const { mutation: updateSetting, isPending: isUpdating } = useMutation({
+    const { mutate: updateSetting, isPending: isUpdating } = useMutation({
         mutationFn: updateSettingApi,
         onSuccess: () => {
             toast.success("Setting successfully edited");
-            queryClient.invalidateQueries({ queryKey: ['settings'] });
+            // Currency, locale and the hotel name are rendered by screens that
+            // don't read `settings` themselves, so refresh everything once.
+            queryClient.invalidateQueries();
         },
         onError: (err) => toast.error(err.message),
     });
 
     return { isUpdating, updateSetting };
 };
-
 

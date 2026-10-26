@@ -10,7 +10,12 @@ import {
 import DataItem from "../../ui/DataItem";
 import { Flag } from "../../ui/Flag";
 
-import { formatDistanceFromNow, formatCurrency } from "../../utils/helpers";
+import {
+  formatDistanceFromNow,
+  formatCurrency,
+  formatTimeOfDay,
+} from "../../utils/helpers";
+import { useSettings } from "../settings/useSettings";
 
 const StyledBookingDataBox = styled.section`
   /* Box */
@@ -94,6 +99,20 @@ const Price = styled.div`
   }
 `;
 
+const HeaderTimes = styled.span`
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 400;
+  opacity: 0.85;
+  margin-top: 0.4rem;
+`;
+
+const PolicyNote = styled.p`
+  font-size: 1.3rem;
+  color: var(--color-grey-500);
+  margin-top: 0.4rem;
+`;
+
 const Footer = styled.footer`
   padding: 1.6rem 4rem;
   font-size: 1.2rem;
@@ -101,8 +120,11 @@ const Footer = styled.footer`
   text-align: right;
 `;
 
-// A purely presentational component
+// Presentational apart from the settings row, which supplies the house rules
+// (arrival times, tax, cancellation policy) shown alongside the stay.
 function BookingDataBox({ booking }) {
+  const { settings } = useSettings();
+
   const {
     created_at,
     startDate,
@@ -126,6 +148,16 @@ function BookingDataBox({ booking }) {
   const computedCabinPrice =
     cabinPrice ?? (computedTotalPrice - Number(computedExtrasPrice ?? 0));
 
+  const taxRate = Number(settings?.taxRate ?? 0);
+  // Prices quoted to the guest are tax inclusive, so back the tax out of the
+  // total rather than adding it on top.
+  const includedTax =
+    taxRate > 0 ? computedTotalPrice - computedTotalPrice / (1 + taxRate / 100) : 0;
+
+  const checkInTime = formatTimeOfDay(settings?.checkInTime);
+  const checkOutTime = formatTimeOfDay(settings?.checkOutTime);
+  const cancellationPolicy = settings?.cancellationPolicy;
+
   return (
     <StyledBookingDataBox>
       <Header>
@@ -142,6 +174,11 @@ function BookingDataBox({ booking }) {
             ? "Today"
             : formatDistanceFromNow(startDate)}
           ) &mdash; {format(new Date(endDate), "EEE, MMM dd yyyy")}
+          {checkInTime && checkOutTime && (
+            <HeaderTimes>
+              Arrival from {checkInTime} &bull; departure by {checkOutTime}
+            </HeaderTimes>
+          )}
         </p>
       </Header>
 
@@ -182,6 +219,21 @@ function BookingDataBox({ booking }) {
 
           <p>{isPaid ? "Paid" : "Will pay at property"}</p>
         </Price>
+
+        {includedTax > 0 && (
+          <PolicyNote>
+            Includes {formatCurrency(includedTax)} of {taxRate}% tax.
+          </PolicyNote>
+        )}
+
+        {cancellationPolicy && (
+          <DataItem
+            icon={<HiOutlineChatBubbleBottomCenterText />}
+            label="Cancellation policy"
+          >
+            {cancellationPolicy}
+          </DataItem>
+        )}
       </Section>
 
       <Footer>

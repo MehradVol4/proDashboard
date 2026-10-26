@@ -1,0 +1,15 @@
+node_modules
+dist
+uploads
+*.log
+
+# SQLite database files
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Local env files - keep the example, never the real secrets
+.env
+.env.*
+!.env.example

@@ -16,9 +16,14 @@ const StyledSelect = styled.select`
 `;
 
 
-function Select({ options, value, onChange }) {
+function Select({ options = [], value = undefined, onChange = undefined, children = null, ...props }) {
+  // Omitting `value` entirely keeps the select uncontrolled, which is what
+  // react-hook-form's `register` needs when its props are spread in.
+  const valueProps = value === undefined ? {} : { value };
+
   return (
-    <StyledSelect value={value} onChange={onChange}>
+    <StyledSelect {...props} {...valueProps} onChange={onChange}>
+      {children}
       {options.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
     </StyledSelect>
   )

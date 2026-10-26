@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.github
+.claude
+*.log
+
+# The API has its own image; keep its build output and local state out of the
+# web build context.
+server/node_modules
+server/dist
+server/uploads
+server/prisma/*.db
+
+.env
+.env.*
+!.env.example

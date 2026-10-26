@@ -3,6 +3,10 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import styled from "styled-components";
 import ScrollToTopButton from "./ScrollToTopButton";
+import Spinner from "./Spinner";
+import { useSettings } from "../features/settings/useSettings";
+import { setCurrencyConfig } from "../utils/helpers";
+import { NotificationsProvider } from "../context/NotificationsContext";
 
 const Main = styled.main.attrs({ id: "app-scroll" })`
     background-color: transparent;
@@ -32,19 +36,39 @@ const StyledAppLayout = styled.div`
 `;
 
 function AppLayout() {
+    // Waiting for settings here means every price below is formatted with the
+    // hotel's own currency on the very first render, instead of flashing the
+    // default and correcting itself.
+    const { settings, isPending, error } = useSettings();
+
+    if (isPending) return <Spinner />;
+
+    // A missing or unreadable settings row shouldn't lock staff out of the app;
+    // the defaults in `helpers` take over.
+    if (!error)
+        setCurrencyConfig({
+            currency: settings?.currency,
+            locale: settings?.locale,
+        });
+
     return (
-        <StyledAppLayout>
-            <Header />
-            <Sidebar />
+        <NotificationsProvider>
+            <StyledAppLayout>
+                <Header />
+                <Sidebar
+                    hotelName={settings?.hotelName}
+                    hotelLogoUrl={settings?.hotelLogoUrl}
+                />
 
-            <Main>
-                <Container>
-                    <Outlet />
-                </Container>
-                <ScrollToTopButton />
-            </Main>
+                <Main>
+                    <Container>
+                        <Outlet />
+                    </Container>
+                    <ScrollToTopButton />
+                </Main>
 
-        </StyledAppLayout>
+            </StyledAppLayout>
+        </NotificationsProvider>
     )
 }
 

@@ -16,12 +16,7 @@ function SignupForm() {
   const { signup, isPending } = useSignup();
 
   const onSubmit = ({ fullName, email, password }) => {
-    signup(
-      { fullName, email, password },
-      {
-        onSettled: () => reset(),
-      }
-    );
+    signup({ fullName, email, password }, { onSettled: () => reset() });
   };
 
   return (
@@ -79,6 +74,7 @@ function SignupForm() {
           })}
         />
       </FormRow>
+
 
       <FormRow>
         {/* type is an HTML attribute! */}

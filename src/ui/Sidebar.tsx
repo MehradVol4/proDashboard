@@ -28,11 +28,11 @@ const StyledSidebar = styled.aside`
 
 
 
-function Sidebar() {
+function Sidebar({ hotelName = "", hotelLogoUrl = "" }) {
 
     return (
         <StyledSidebar>
-            <Logo />
+            <Logo hotelName={hotelName} hotelLogoUrl={hotelLogoUrl} />
             <MainNav />
         </StyledSidebar>
     )

@@ -1,85 +1,71 @@
-import supabase, { supabaseUrl } from "./supabase";
+import { api, clearToken, setToken, toFormData } from "./apiClient";
 
 export async function login({ email, password }) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    })
+    const data = await api.post("/auth/login", { email, password }, { auth: false });
 
-    if (error)
-        throw new Error(error.message)
-
+    setToken(data?.session?.token);
     return data;
-
 }
 
+// Creating a staff account from the Users page. The returned token is
+// deliberately discarded: the admin doing this stays signed in as themselves.
 export async function signup({ fullName, email, password }) {
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            data: {
-                fullName,
-                avatar: '',
-            },
-        },
-    });
-
-    if (error) throw new Error(error.message);
-
-    return data;
+    const data = await api.post("/auth/signup", { fullName, email, password });
+    return { user: data?.user, session: null };
 }
 
 export async function getCurrentUser() {
+    if (!localStorageHasToken()) return null;
 
-    const { data: session } = await supabase.auth.getSession();
+    try {
+        return await api.get("/auth/me");
+    } catch (err) {
+        // An expired or revoked token should log the person out rather than
+        // leaving the app retrying forever.
+        if (err.status === 401) {
+            clearToken();
+            return null;
+        }
+        throw err;
+    }
+}
 
-    if (!session.session) return null;
-
-    const { data, error } = await supabase.auth.getUser()
-
-    if (error) throw new Error(error.message);
-
-    return data?.user;
+function localStorageHasToken() {
+    try {
+        return Boolean(window.localStorage.getItem("proDashboard.token"));
+    } catch {
+        return false;
+    }
 }
 
 export async function logout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw new Error(error.message);
+    // Nothing to invalidate server side: the JWT simply stops being sent.
+    clearToken();
 }
-
 
 export async function updateCurrentUser({ password, fullName, avatar }) {
     if (!password && !fullName && !avatar) return null;
 
-    const updateData = {};
+    const body = avatar
+        ? toFormData({ fullName, password, avatar })
+        : { ...(fullName ? { fullName } : {}), ...(password ? { password } : {}) };
 
-    if (password) updateData.password = password;
-    if (fullName) updateData.data = { ...(updateData.data ?? {}), fullName };
+    return api.patch("/auth/me", body);
+}
 
-    if (avatar) {
-        const {
-            data: { user },
-            error: userError,
-        } = await supabase.auth.getUser();
-        if (userError) throw new Error(userError.message);
-        if (!user) throw new Error("No authenticated user found.");
+// --- Password recovery -----------------------------------------------------
 
-        const fileName = `avatar-${user.id}-${Math.random()}`;
+export async function requestPasswordReset({ email }) {
+    return api.post("/auth/forgot-password", { email }, { auth: false });
+}
 
-        const { error: storageError } = await supabase.storage
-            .from("avatars")
-            .upload(fileName, avatar);
-        if (storageError) throw new Error(storageError.message);
+export async function updatePassword({ password, token }) {
+    const data = await api.post(
+        "/auth/reset-password",
+        { password, token },
+        { auth: false }
+    );
 
-        updateData.data = {
-            ...(updateData.data ?? {}),
-            avatar: `${supabaseUrl}/storage/v1/object/public/avatars/${fileName}`,
-        };
-    }
-
-    const { data, error } = await supabase.auth.updateUser(updateData);
-
-    if (error) throw new Error(error.message);
+    setToken(data?.session?.token);
     return data;
 }

@@ -24,7 +24,65 @@ export const getToday = function (options = {}) {
   return today.toISOString();
 };
 
-export const formatCurrency = (value) =>
-  new Intl.NumberFormat('en', { style: 'currency', currency: 'USD' }).format(
-    value
-  );
+const DEFAULT_CURRENCY_CONFIG = { currency: 'USD', locale: 'en' };
+
+// `formatCurrency` is called from plain render code all over the app, so the
+// currency and locale live here as module state rather than in a context. The
+// app shell applies the values from the `settings` row before rendering any
+// page, and saving a setting invalidates every query so the new format shows
+// up right away.
+let currencyConfig = { ...DEFAULT_CURRENCY_CONFIG };
+
+export const getCurrencyConfig = () => ({ ...currencyConfig });
+
+export function setCurrencyConfig({ currency, locale } = {}) {
+  const next = {
+    currency: currency || DEFAULT_CURRENCY_CONFIG.currency,
+    locale: locale || DEFAULT_CURRENCY_CONFIG.locale,
+  };
+
+  if (
+    next.currency === currencyConfig.currency &&
+    next.locale === currencyConfig.locale
+  )
+    return false;
+
+  currencyConfig = next;
+  return true;
+}
+
+export const formatCurrency = (value) => {
+  const amount = Number(value ?? 0);
+
+  try {
+    return new Intl.NumberFormat(currencyConfig.locale, {
+      style: 'currency',
+      currency: currencyConfig.currency,
+    }).format(amount);
+  } catch {
+    // An unknown currency code or locale makes Intl throw, so fall back to the
+    // defaults instead of blowing up the page that is only trying to show a price.
+    return new Intl.NumberFormat(DEFAULT_CURRENCY_CONFIG.locale, {
+      style: 'currency',
+      currency: DEFAULT_CURRENCY_CONFIG.currency,
+    }).format(amount);
+  }
+};
+
+// Settings store times as "HH:MM"; show them the way people read them.
+export const formatTimeOfDay = (value) => {
+  if (!value) return '';
+
+  const [hours, minutes] = String(value).split(':');
+  const date = new Date();
+  date.setHours(Number(hours) || 0, Number(minutes) || 0, 0, 0);
+
+  try {
+    return new Intl.DateTimeFormat(currencyConfig.locale, {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return String(value);
+  }
+};

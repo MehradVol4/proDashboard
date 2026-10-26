@@ -2,6 +2,14 @@ import Heading from "../ui/Heading";
 import Row from "../ui/Row";
 import BookingTable from "../features/bookings/BookingTable";
 import BookingTableOperations from "../features/bookings/BookingTableOperations";
+import AddBooking from "../features/bookings/AddBooking";
+import styled from "styled-components";
+
+const Actions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+`;
 
 function Bookings() {
   return (
@@ -10,7 +18,10 @@ function Bookings() {
         <Heading as="h1">
           All <span className="accent-text">bookings</span>
         </Heading>
-        <BookingTableOperations />
+        <Actions>
+          <BookingTableOperations />
+          <AddBooking />
+        </Actions>
       </Row>
 
       <BookingTable></BookingTable>

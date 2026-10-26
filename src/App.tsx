@@ -7,10 +7,14 @@ import Dashboard from "./pages/Dashboard";
 import Bookings from "./pages/Bookings";
 import Cabins from "./pages/Cabins";
 import Users from "./pages/Users";
+import Guests from "./pages/Guests";
+import Guest from "./pages/Guest";
 import Settings from "./pages/Settings";
 import Account from "./pages/Account";
 import Login from "./pages/Login";
 import PageNotFound from "./pages/PageNotFound";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import AppLayout from "./ui/AppLayout";
 import { Toaster } from "react-hot-toast";
 import Booking from "./pages/Booking";
@@ -52,12 +56,16 @@ function App() {
                 <Route path="bookings/:bookingId" element={<Booking />} />
                 <Route path="checkin/:bookingId" element={<Checkin />} />
                 <Route path="cabins" element={<Cabins />} />
+                <Route path="guests" element={<Guests />} />
+                <Route path="guests/:guestId" element={<Guest />} />
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="account" element={<Account />} />
               </Route>
 
               <Route path="login" element={<Login />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password" element={<ResetPassword />} />
               <Route path="*" element={<PageNotFound />} />
 
             </Routes>

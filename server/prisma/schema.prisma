@@ -1,0 +1,95 @@
+// Field and relation names here deliberately mirror the JSON shape the React
+// app already consumes (`created_at`, and relations called `cabins` / `guests`),
+// so the client keeps working without a translation layer in between. Swapping
+// SQLite for Postgres later is a change to `provider` and the DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  email      String   @unique
+  password   String
+  fullName   String
+  avatar     String?
+
+  resetToken       String?
+  resetTokenExpiry DateTime?
+}
+
+model Cabin {
+  id           Int      @id @default(autoincrement())
+  created_at   DateTime @default(now())
+  name         String   @unique
+  maxCapacity  Int
+  regularPrice Float
+  discount     Float    @default(0)
+  description  String?
+  image        String?
+
+  bookings Booking[]
+}
+
+model Guest {
+  id          Int      @id @default(autoincrement())
+  created_at  DateTime @default(now())
+  fullName    String
+  email       String
+  nationality String?
+  nationalID  String?
+  countryFlag String?
+
+  bookings Booking[]
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  created_at  DateTime @default(now())
+  startDate   DateTime
+  endDate     DateTime
+  numNights   Int
+  numGuests   Int
+  cabinPrice  Float    @default(0)
+  extrasPrice Float    @default(0)
+  totalPrice  Float    @default(0)
+  // "unconfirmed" | "checked-in" | "checked-out". SQLite has no enum support in
+  // Prisma, so this is validated by the DTO instead.
+  status      String   @default("unconfirmed")
+  hasBreakfast Boolean @default(false)
+  isPaid       Boolean @default(false)
+  observations String?
+
+  cabinId Int
+  guestId Int
+
+  cabins Cabin @relation(fields: [cabinId], references: [id])
+  guests Guest @relation(fields: [guestId], references: [id])
+
+  @@index([cabinId])
+  @@index([guestId])
+  @@index([startDate])
+}
+
+model Settings {
+  id                 Int    @id @default(1)
+  minBookingLength   Int    @default(1)
+  maxBookingLength   Int    @default(90)
+  maxGuestPerBooking Int    @default(8)
+  breakfastPrice     Float  @default(15)
+
+  hotelName          String?
+  hotelLogoUrl       String?
+  currency           String  @default("USD")
+  locale             String  @default("en")
+  taxRate            Float   @default(0)
+  checkInTime        String?
+  checkOutTime       String?
+  cancellationPolicy String?
+}
