@@ -7,10 +7,12 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 COPY server/package*.json ./
+# The schema has to be here before `npm ci`: the API's postinstall hook runs
+# `prisma generate`, which fails outright when it cannot find a schema.
+COPY server/prisma ./prisma
 RUN npm ci
 
 COPY server/tsconfig.json server/nest-cli.json ./
-COPY server/prisma ./prisma
 COPY server/src ./src
 
 RUN npx prisma generate && npx nest build

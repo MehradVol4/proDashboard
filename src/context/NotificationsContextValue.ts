@@ -15,7 +15,6 @@ export type NotificationsContextValue = {
   unreadCount: number;
   isLive: boolean;
   markAllRead: () => void;
-  // eslint-disable-next-line no-unused-vars
   markRead: (key: string) => void;
   clearAll: () => void;
 };
